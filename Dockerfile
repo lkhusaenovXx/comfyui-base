@@ -5,15 +5,15 @@ FROM ubuntu:24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ---- Version pins (set in docker-bake.hcl) ----
-ARG COMFYUI_VERSION
-ARG MANAGER_SHA
-ARG KJNODES_SHA
-ARG CIVICOMFY_SHA
-ARG RUNPODDIRECT_SHA
-ARG TORCH_VERSION
-ARG TORCHVISION_VERSION
-ARG TORCHAUDIO_VERSION
+# ---- Version pins (defaults match docker-bake.hcl, overridable at build time) ----
+ARG COMFYUI_VERSION=v0.18.2
+ARG MANAGER_SHA=bbafbb1290f0
+ARG KJNODES_SHA=068d4fee62d3
+ARG CIVICOMFY_SHA=555e984bbcb0
+ARG RUNPODDIRECT_SHA=6f3a08b8b79c
+ARG TORCH_VERSION=2.10.0+cu128
+ARG TORCHVISION_VERSION=0.25.0+cu128
+ARG TORCHAUDIO_VERSION=2.10.0+cu128
 
 # ---- CUDA variant (set in docker-bake.hcl per target) ----
 ARG CUDA_VERSION_DASH=12-8
@@ -130,8 +130,8 @@ ENV FILEBROWSER_CONFIG=/workspace/runpod-slim/.filebrowser.json
 ARG CUDA_VERSION_DASH=12-8
 
 # ---- FileBrowser version pin (set in docker-bake.hcl) ----
-ARG FILEBROWSER_VERSION
-ARG FILEBROWSER_SHA256
+ARG FILEBROWSER_VERSION=v2.59.0
+ARG FILEBROWSER_SHA256=8cd8c3baecb086028111b912f252a6e3169737fa764b5c510139e81f9da87799
 
 # Update and install runtime dependencies, CUDA, and common tools
 RUN apt-get update && \
