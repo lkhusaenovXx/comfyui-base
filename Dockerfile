@@ -185,6 +185,9 @@ COPY --from=builder /opt/comfyui-baked /opt/comfyui-baked
 RUN pip uninstall -y uv 2>/dev/null || true && \
     rm -f /usr/local/bin/uv /usr/local/bin/uvx
 
+# Install RunPod serverless SDK
+RUN pip install --no-cache-dir runpod
+
 # Install FileBrowser (pinned version with checksum)
 RUN curl -fSL "https://github.com/filebrowser/filebrowser/releases/download/${FILEBROWSER_VERSION}/linux-amd64-filebrowser.tar.gz" -o /tmp/fb.tar.gz && \
     echo "${FILEBROWSER_SHA256}  /tmp/fb.tar.gz" | sha256sum -c - && \
@@ -216,8 +219,9 @@ WORKDIR /workspace/runpod-slim
 # Expose ports
 EXPOSE 8188 22 8888 8080
 
-# Copy start script
+# Copy start script and serverless handler
 COPY start.sh /start.sh
+COPY rp_handler.py /rp_handler.py
 
 # Set Python 3.12 as default
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 && \

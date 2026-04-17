@@ -218,6 +218,19 @@ if [ -s "$ARGS_FILE" ]; then
 fi
 
 echo "Starting ComfyUI with args: $FIXED_ARGS"
+
+# Serverless mode: run ComfyUI in background, then start the RunPod handler
+if [ "${SERVERLESS:-false}" = "true" ] || [ ! -z "$RUNPOD_WEBHOOK_GET_JOB" ]; then
+    echo "Running in serverless mode"
+    python main.py $FIXED_ARGS &
+    COMFY_PID=$!
+    trap "kill $COMFY_PID 2>/dev/null" SIGTERM SIGINT
+    python /rp_handler.py
+    kill $COMFY_PID 2>/dev/null
+    exit 0
+fi
+
+# Pod mode: run ComfyUI as main process, keep container alive if it crashes
 python main.py $FIXED_ARGS &
 COMFY_PID=$!
 trap "kill $COMFY_PID 2>/dev/null" SIGTERM SIGINT
