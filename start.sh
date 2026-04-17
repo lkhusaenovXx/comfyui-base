@@ -1,11 +1,23 @@
 #!/bin/bash
 set -e  # Exit the script if any statement returns a non-true return value
 
-COMFYUI_DIR="/workspace/runpod-slim/ComfyUI"
+# Prefer RunPod network volume when attached, else fall back to pod-ephemeral /workspace
+if [ -d "/runpod-volume" ]; then
+    PERSIST_ROOT="/runpod-volume"
+    echo "RunPod network volume detected — using $PERSIST_ROOT for persistent state"
+else
+    PERSIST_ROOT="/workspace"
+fi
+
+WORKSPACE="$PERSIST_ROOT/runpod-slim"
+mkdir -p "$WORKSPACE"
+cd "$WORKSPACE"
+
+COMFYUI_DIR="$WORKSPACE/ComfyUI"
 VENV_DIR="$COMFYUI_DIR/.venv-cu128"
 OLD_VENV_DIR="$COMFYUI_DIR/.venv"
 FILEBROWSER_CONFIG="/root/.config/filebrowser/config.json"
-DB_FILE="/workspace/runpod-slim/filebrowser.db"
+DB_FILE="$WORKSPACE/filebrowser.db"
 
 # ---------------------------------------------------------------------------- #
 #                          Function Definitions                                  #
@@ -86,7 +98,7 @@ export_env_vars() {
 
 # Start Jupyter Lab server for remote access
 start_jupyter() {
-    mkdir -p /workspace
+    mkdir -p "$PERSIST_ROOT"
     echo "Starting Jupyter Lab on port 8888..."
     nohup jupyter lab \
         --allow-root \
@@ -94,8 +106,8 @@ start_jupyter() {
         --port=8888 \
         --ip=0.0.0.0 \
         --FileContentsManager.delete_to_trash=False \
-        --FileContentsManager.preferred_dir=/workspace \
-        --ServerApp.root_dir=/workspace \
+        --FileContentsManager.preferred_dir="$PERSIST_ROOT" \
+        --ServerApp.root_dir="$PERSIST_ROOT" \
         --ServerApp.terminado_settings='{"shell_command":["/bin/bash"]}' \
         --IdentityProvider.token="${JUPYTER_PASSWORD:-}" \
         --ServerApp.allow_origin=* &> /jupyter.log &
@@ -116,7 +128,7 @@ if [ ! -f "$DB_FILE" ]; then
     filebrowser config init
     filebrowser config set --address 0.0.0.0
     filebrowser config set --port 8080
-    filebrowser config set --root /workspace
+    filebrowser config set --root "$PERSIST_ROOT"
     filebrowser config set --auth.method=json
     filebrowser users add admin adminadmin12 --perm.admin
 else
@@ -130,7 +142,7 @@ nohup filebrowser &> /filebrowser.log &
 start_jupyter
 
 # Create default comfyui_args.txt if it doesn't exist
-ARGS_FILE="/workspace/runpod-slim/comfyui_args.txt"
+ARGS_FILE="$WORKSPACE/comfyui_args.txt"
 if [ ! -f "$ARGS_FILE" ]; then
     echo "# Add your custom ComfyUI arguments here (one per line)" > "$ARGS_FILE"
     echo "Created empty ComfyUI arguments file at $ARGS_FILE"

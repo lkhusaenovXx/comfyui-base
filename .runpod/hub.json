@@ -7,6 +7,7 @@
   "config": {
     "runsOn": "GPU",
     "containerDiskInGb": 30,
+    "ports": "8188/http,8080/http,8888/http,22/tcp",
     "env": [
       {
         "key": "COMFYUI_TIMEOUT",
