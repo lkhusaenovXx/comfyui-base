@@ -1,0 +1,22 @@
+{
+  "title": "ComfyUI Base",
+  "description": "Run the latest ComfyUI with pre-installed dependencies, custom nodes, and CUDA 12.8 support. Accepts ComfyUI workflow JSON and returns generated images.",
+  "type": "serverless",
+  "category": "image",
+  "iconUrl": "https://raw.githubusercontent.com/comfyanonymous/ComfyUI/master/web/assets/favicon.ico",
+  "config": {
+    "runsOn": "GPU",
+    "containerDiskInGb": 30,
+    "env": [
+      {
+        "key": "COMFYUI_TIMEOUT",
+        "input": {
+          "name": "Workflow Timeout",
+          "type": "string",
+          "description": "Maximum seconds to wait for a workflow to complete",
+          "default": "300"
+        }
+      }
+    ]
+  }
+}
