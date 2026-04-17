@@ -203,6 +203,10 @@ fi
 # Warm up pip so ComfyUI-Manager's 5s timeout check doesn't fail on cold start
 python -m pip --version > /dev/null 2>&1
 
+# Upgrade transformers & huggingface_hub to latest on each start
+echo "Upgrading transformers and huggingface_hub..."
+pip install --upgrade transformers huggingface_hub 2>&1 | tail -1
+
 # Start ComfyUI — keep container alive if it crashes so SSH/Jupyter remain accessible
 cd $COMFYUI_DIR
 FIXED_ARGS="--listen 0.0.0.0 --port 8188 --enable-cors-header"
