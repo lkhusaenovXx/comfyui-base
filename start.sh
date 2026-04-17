@@ -225,7 +225,7 @@ if [ "${SERVERLESS:-false}" = "true" ] || [ ! -z "$RUNPOD_WEBHOOK_GET_JOB" ]; th
     python main.py $FIXED_ARGS &
     COMFY_PID=$!
     trap "kill $COMFY_PID 2>/dev/null" SIGTERM SIGINT
-    python /rp_handler.py
+    python /handler.py
     kill $COMFY_PID 2>/dev/null
     exit 0
 fi
